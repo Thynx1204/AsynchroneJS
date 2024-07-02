@@ -17,8 +17,7 @@ async function fetchWithRetry(url, options, retries, delay) {
                 throw error;
             }
             console.log(`Attempt ${i + 1} failed. Retrying in ${delay}ms...`);
-            await toWait(delay);
-
+            /* await toWait(delay); */
         }
     }
 }
