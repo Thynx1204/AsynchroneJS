@@ -1,53 +1,50 @@
-/* import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import UserList from './UserList';
+import UserDetail from './UserDetail';
+import SearchBar from './SearchBar';
+import { fetchUsers } from './api';
 import './App.css';
 
-function App() {
+const App = () => {
     const [users, setUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedUser, setSelectedUser] = useState(null);
 
     useEffect(() => {
-        fetch('/users')
-            .then(response => response.json())
-            .then(data => setUsers(data));
+        const getUsers = async () => {
+            try {
+                const users = await fetchUsers();
+                setUsers(users);
+            } catch (error) {
+                console.error('Error fetching users:', error);
+            }
+        };
+
+        getUsers();
     }, []);
 
-    const handleSearch = (event) => {
-        setSearchTerm(event.target.value);
-    };
-
-    const filteredUsers = users.filter(user => 
+    const filteredUsers = users.filter(user =>
         `${user.name.first} ${user.name.last}`.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
-        <div className="App">
-            <h1>User search and display</h1>
-            <input 
-                type="text" 
-                placeholder="Search for users" 
-                value={searchTerm}
-                onChange={handleSearch}
-            />
-            <ul>
-                {filteredUsers.map(user => (
-                    <li key={user.login.uuid} onClick={() => setSelectedUser(user)}>
-                        {user.name.first} {user.name.last}
-                    </li>
-                ))}
-            </ul>
-            {selectedUser && (
-                <div className="user-details">
-                    <h2>{selectedUser.name.first} {selectedUser.name.last}</h2>
-                    <p><strong>Email:</strong> {selectedUser.email}</p>
-                    <p><strong>Phone:</strong> {selectedUser.phone}</p>
-                    <p><strong>Location:</strong> {selectedUser.location.city}, {selectedUser.location.country}</p>
-                    <img src={selectedUser.picture.large} alt={`${selectedUser.name.first} ${selectedUser.name.last}`} />
-                </div>
-            )}
-        </div>
+        <Router>
+            <div className="container">
+                <Routes>
+                    <Route 
+                        path="/" 
+                        element={
+                            <>
+                                <SearchBar value={searchTerm} onChange={setSearchTerm} />
+                                <UserList users={filteredUsers} />
+                            </>
+                        } 
+                    />
+                    <Route path="/user/:id" element={<UserDetail users={users} />} />
+                </Routes>
+            </div>
+        </Router>
     );
-}
+};
 
-export default App; 
- */
+export default App;
